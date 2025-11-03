@@ -6,6 +6,7 @@ import { WeatherForecast } from './models/weather-forecast';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css',

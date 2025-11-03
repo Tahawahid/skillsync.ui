@@ -1,0 +1,64 @@
+.onboarding-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.onboarding-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+
+  h1 {
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    font-weight: 600;
+  }
+
+  .progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 8px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 10px;
+    overflow: hidden;
+
+    .progress {
+      background: white;
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+  }
+
+  p {
+    margin: 10px 0 0 0;
+    font-size: 1.1rem;
+  }
+}
+
+.onboarding-content {
+  display: flex;
+  justify-content: center;
+}
+
+.form-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .onboarding-header h1 {
+    font-size: 2rem;
+  }
+  
+  .form-container {
+    padding: 25px;
+    margin: 0 10px;
+  }
+}

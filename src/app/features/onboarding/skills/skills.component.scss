@@ -1,0 +1,161 @@
+.step-container {
+  .step-header {
+    text-align: center;
+    margin-bottom: 30px;
+
+    h2 {
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .step-form {
+    .skills-section {
+      margin-bottom: 30px;
+
+      > label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 500;
+        color: #333;
+        font-size: 16px;
+      }
+
+      .skill-input {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+
+        .form-control {
+          flex: 1;
+          padding: 12px;
+          border: 2px solid #e1e5e9;
+          border-radius: 8px;
+          font-size: 14px;
+          transition: border-color 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: #667eea;
+          }
+        }
+
+        .btn-add {
+          background: #28a745;
+          color: white;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+          white-space: nowrap;
+
+          &:hover:not(:disabled) {
+            background: #218838;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+
+      .skills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+
+        .skill-tag {
+          background: #667eea;
+          color: white;
+          padding: 8px 12px;
+          border-radius: 20px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          &.learn-skill {
+            background: #28a745;
+          }
+
+          .remove-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            line-height: 1;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.5);
+            }
+          }
+        }
+      }
+    }
+
+    .step-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 30px;
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &.btn-primary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.btn-secondary {
+          background: #6c757d;
+          color: white;
+
+          &:hover {
+            background: #5a6268;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .step-container .step-form .skills-section .skill-input {
+    flex-direction: column;
+    
+    .btn-add {
+      align-self: flex-start;
+    }
+  }
+}
