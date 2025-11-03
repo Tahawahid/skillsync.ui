@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { OnboardingComplete, OnboardingResponse } from '../models/onboarding.models';
 import { AuthService } from './auth.service';
@@ -15,26 +15,23 @@ export class OnboardingService {
     private authService: AuthService
   ) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
   completeOnboarding(onboardingData: OnboardingComplete): Observable<OnboardingResponse> {
-    return this.http.post<OnboardingResponse>(
-      `${this.API_URL}/complete`, 
-      onboardingData,
-      { headers: this.getHeaders() }
-    );
+    const userId = this.authService.getCurrentUserId();
+    console.log('OnboardingService: Sending data for user ID:', userId);
+    console.log('OnboardingService: Onboarding data:', onboardingData);
+    
+    const payload = {
+      userId: userId,
+      ...onboardingData
+    };
+    
+    console.log('OnboardingService: Complete payload:', payload);
+    return this.http.post<OnboardingResponse>(`${this.API_URL}/complete`, payload);
   }
 
   getOnboardingData(): Observable<OnboardingComplete> {
-    return this.http.get<OnboardingComplete>(
-      `${this.API_URL}/data`,
-      { headers: this.getHeaders() }
-    );
+    const userId = this.authService.getCurrentUserId();
+    console.log('OnboardingService: Getting data for user ID:', userId);
+    return this.http.get<OnboardingComplete>(`${this.API_URL}/data/${userId}`);
   }
 }

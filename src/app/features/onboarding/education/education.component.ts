@@ -70,6 +70,7 @@ import { Education } from '../../../models/onboarding.models';
             <input
               type="text"
               [(ngModel)]="newCertification"
+              [ngModelOptions]="{standalone: true}"
               class="form-control"
               placeholder="Enter certification name"
               (keyup.enter)="addCertification()"
@@ -153,8 +154,8 @@ export class EducationComponent implements OnInit {
   }
 
   canAddCertification(): boolean {
-  return !!(this.newCertification && this.newCertification.trim().length > 0);
-}
+    return !!(this.newCertification && this.newCertification.trim().length > 0);
+  }
 
   onCertificationInput(): void {
     // This method helps trigger change detection

@@ -16,30 +16,26 @@ export class AuthService {
   }
 
   register(registerData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/register`, registerData)
-      .pipe(
-        tap(response => {
-          if (response.success && response.user) {
-            this.setCurrentUser(response.user, response.token);
-          }
-        })
-      );
+    return this.http.post<AuthResponse>(`${this.API_URL}/register`, registerData);
   }
 
   login(loginData: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.API_URL}/login`, loginData)
       .pipe(
         tap(response => {
+          console.log('Login response:', response);
           if (response.success && response.user) {
-            this.setCurrentUser(response.user, response.token);
+            console.log('Storing user data:', response.user);
+            this.setCurrentUser(response.user);
           }
         })
       );
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    console.log('Logging out, clearing storage');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userId');
     this.currentUserSubject.next(null);
   }
 
@@ -47,25 +43,40 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  getCurrentUserId(): number | null {
+    const userId = localStorage.getItem('userId');
+    return userId ? parseInt(userId) : null;
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const user = this.getCurrentUser();
+    const userId = this.getCurrentUserId();
+    return !!user && !!userId;
   }
 
-  private setCurrentUser(user: User, token: string): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+  private setCurrentUser(user: User): void {
+    console.log('Setting current user:', user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('userId', user.id.toString()); // Store user ID separately
     this.currentUserSubject.next(user);
+    
+    console.log('Stored user ID:', user.id);
+    console.log('Verification - User ID in storage:', localStorage.getItem('userId'));
   }
 
   private loadUserFromStorage(): void {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
+    console.log('Loading user from storage...');
+    const userJson = localStorage.getItem('currentUser');
+    const userId = localStorage.getItem('userId');
+    
+    console.log('Storage check:', { hasUser: !!userJson, hasUserId: !!userId });
+    
+    if (userJson && userId) {
       const user = JSON.parse(userJson);
       this.currentUserSubject.next(user);
+      console.log('User loaded from storage:', user);
+    } else {
+      console.log('No user data in storage');
     }
   }
 }

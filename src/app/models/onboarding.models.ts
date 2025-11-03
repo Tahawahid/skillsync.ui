@@ -38,6 +38,7 @@ export interface CareerGoals {
 }
 
 export interface OnboardingComplete {
+  userId?: number; // Add this field
   personalDetails: PersonalDetails;
   education: Education;
   workExperience: WorkExperience;

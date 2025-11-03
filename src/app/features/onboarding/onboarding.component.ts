@@ -9,8 +9,7 @@ import { CareerGoalsComponent } from './career-goals/career-goals.component';
 import { ReviewComponent } from './review/review.component';
 import { OnboardingService } from '../../services/onboarding.service';
 import { OnboardingComplete, PersonalDetails, Education, WorkExperience, Skills, CareerGoals } from '../../models/onboarding.models';
-import { AuthService } from '../../services/auth.service'; // <-- Add this import
-
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-onboarding',
@@ -131,11 +130,19 @@ export class OnboardingComponent implements OnInit {
   constructor(
     private onboardingService: OnboardingService,
     private router: Router,
-    private authService: AuthService // <-- Inject AuthService here
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    // Load existing data if available
+    // Check if user ID exists
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      console.log('No user ID found, redirecting to login');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    console.log('Starting onboarding for user ID:', userId);
     this.loadExistingData();
   }
 
@@ -157,68 +164,130 @@ export class OnboardingComponent implements OnInit {
 
   updatePersonalDetails(data: PersonalDetails) {
     this.onboardingData.personalDetails = data;
+    console.log('Updated personal details:', data);
   }
 
   updateEducation(data: Education) {
     this.onboardingData.education = data;
+    console.log('Updated education:', data);
   }
 
   updateWorkExperience(data: WorkExperience) {
     this.onboardingData.workExperience = data;
+    console.log('Updated work experience:', data);
   }
 
   updateSkills(data: Skills) {
     this.onboardingData.skills = data;
+    console.log('Updated skills:', data);
   }
 
   updateCareerGoals(data: CareerGoals) {
     this.onboardingData.careerGoals = data;
+    console.log('Updated career goals:', data);
   }
 
-  // ...existing code...
-
-completeOnboarding() {
-  this.isLoading = true;
-  this.onboardingService.completeOnboarding(this.onboardingData).subscribe({
-    next: (response) => {
-      this.isLoading = false;
-      if (response.success) {
-        // Update the user's onboarding status locally
-        const currentUser = this.authService.getCurrentUser();
-        if (currentUser) {
-          currentUser.isOnboardingCompleted = true;
-          // Update stored user data
-          localStorage.setItem('user', JSON.stringify(currentUser));
-        }
-        this.router.navigate(['/dashboard']);
-      }
-    },
-    error: (error) => {
-      this.isLoading = false;
-      console.error('Onboarding failed:', error);
-      if (error.status === 401) {
-        // Token expired or invalid, redirect to login
-        this.authService.logout();
-        this.router.navigate(['/login'], { 
-          queryParams: { 
-            message: 'Your session has expired. Please login again.' 
-          }
-        });
-      }
+  completeOnboarding() {
+    console.log('Complete onboarding button clicked');
+    
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      console.log('No user ID found');
+      this.router.navigate(['/login']);
+      return;
     }
-  });
-}
 
-// ...existing code...
+    // Add user ID to onboarding data
+    this.onboardingData.userId = userId;
+    
+    console.log('Final onboarding data:', this.onboardingData);
+    
+    // Validate data before sending
+    if (!this.validateOnboardingData()) {
+      console.error('Onboarding data validation failed');
+      alert('Please ensure all required fields are filled out.');
+      return;
+    }
+
+    this.isLoading = true;
+    console.log('Sending onboarding data to backend...');
+
+    this.onboardingService.completeOnboarding(this.onboardingData).subscribe({
+      next: (response) => {
+        console.log('Onboarding response received:', response);
+        this.isLoading = false;
+        
+        if (response.success) {
+          console.log('Onboarding completed successfully');
+          
+          // Update the user's onboarding status locally
+          const currentUser = this.authService.getCurrentUser();
+          if (currentUser) {
+            currentUser.isOnboardingCompleted = true;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            console.log('Updated user onboarding status locally');
+          }
+          
+          // Navigate to dashboard
+          this.router.navigate(['/dashboard']);
+        } else {
+          console.error('Onboarding failed:', response.message);
+          alert('Onboarding failed: ' + response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Onboarding error:', error);
+        this.isLoading = false;
+        alert('Failed to complete onboarding. Please try again.');
+      }
+    });
+  }
+
+  private validateOnboardingData(): boolean {
+    console.log('Validating onboarding data...');
+    
+    // Check personal details
+    if (!this.onboardingData.personalDetails.age || 
+        !this.onboardingData.personalDetails.location || 
+        !this.onboardingData.personalDetails.currentRole) {
+      console.log('Personal details validation failed');
+      return false;
+    }
+
+    // Check education
+    if (!this.onboardingData.education.highestEducation || 
+        !this.onboardingData.education.fieldOfStudy) {
+      console.log('Education validation failed');
+      return false;
+    }
+
+    // Check work experience
+    if (!this.onboardingData.workExperience.experienceLevel) {
+      console.log('Work experience validation failed');
+      return false;
+    }
+
+    // Check career goals
+    if (!this.onboardingData.careerGoals.timeframe || 
+        !this.onboardingData.careerGoals.workPreference ||
+        this.onboardingData.careerGoals.goals.length === 0) {
+      console.log('Career goals validation failed');
+      return false;
+    }
+
+    console.log('Validation passed');
+    return true;
+  }
 
   private loadExistingData() {
+    console.log('Loading existing onboarding data...');
     this.onboardingService.getOnboardingData().subscribe({
       next: (data) => {
+        console.log('Loaded existing onboarding data:', data);
         this.onboardingData = data;
       },
       error: (error) => {
-        // No existing data, start fresh
-        console.log('No existing onboarding data');
+        console.log('No existing onboarding data found:', error);
       }
     });
   }
